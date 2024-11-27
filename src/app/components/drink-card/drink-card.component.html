@@ -1,0 +1,18 @@
+<label class="name">{{ drink.name }}</label><br>
+
+<label>Quantidade</label>
+
+<div class="info--item" [formGroup]="form">
+  <input type="text" pInputText
+         formControlName="amount"
+         class="mb-3"
+         readonly/>
+  <p-slider formControlName="amount"
+            [step]="1"
+            orientation="vertical"
+            (onChange)="setAmount($event)"
+            [max]="10"
+  ></p-slider>
+
+  <img class="img" [src]="drink.imageUrl">
+</div>

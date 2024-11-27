@@ -1,0 +1,25 @@
+.home {
+  padding: .5rem;
+  background: var(--pattern-color);
+
+  &--products-menu {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    overflow: auto hidden;
+    padding: .5rem 0;
+
+    &--option {
+      padding: 1rem;
+      border-radius: 0.5rem;
+      background: black;
+      font-weight: bold;
+      min-width: 8rem;
+      color: white;
+    }
+  }
+}
+
+.selected-tab {
+  background: var(--secondary-color) !important;
+}

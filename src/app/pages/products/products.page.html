@@ -1,0 +1,45 @@
+<app-banner></app-banner>
+
+<div class="home" [formGroup]="formGroup">
+
+  <h4>{{ appName }}</h4>
+
+  <div class="home--products-menu">
+    <ng-container *ngFor="let product of products">
+      <button (click)="setTabMenu(product.tabId)" class="home--products-menu--option"
+              [class.selected-tab]="selectedTab === product.tabId">{{ translatedProducts[product.name] }}
+      </button>
+    </ng-container>
+    <button (click)="setTabMenu('drinks')" class="home--products-menu--option"
+            [class.selected-tab]="selectedTab === 'drinks'">Drinks
+    </button>
+  </div>
+
+  <div class="mt-3">
+    <ng-container *ngIf="pizzas.length">
+      <ng-container *ngFor="let pizza of pizzas; let i = index; trackBy: trackBy">
+        <ng-container formArrayName="pizzas">
+          <ng-container [formGroupName]="i">
+            <app-pizza-card [pizza]="pizza" [form]="formGroup.get('pizzas')?.get(i.toString())"></app-pizza-card>
+            <div class="mb-3"></div>
+          </ng-container>
+        </ng-container>
+      </ng-container>
+    </ng-container>
+  </div>
+
+  <div class="my-3">
+    <ng-container *ngIf="drinks.length">
+      <ng-container *ngFor="let drink of drinks; let i = index; trackBy: trackBy">
+        <ng-container formArrayName="drinks">
+          <ng-container [formGroupName]="i">
+            <app-drink-card class="mb-3" [drink]="drink" [form]="formGroup.get('drinks')?.get(i.toString())"></app-drink-card>
+          </ng-container>
+        </ng-container>
+      </ng-container>
+    </ng-container>
+  </div>
+
+  <p-button label="enviar" (click)="onSubmit()"></p-button>
+
+</div>

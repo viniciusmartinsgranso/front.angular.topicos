@@ -1,0 +1,14 @@
+<div class="carroussel">
+    <div class="carroussel--img" [style.transform]="'translateX(-' + currentIndex * 100 + '%)'">
+        <img *ngFor="let image of images; let i = index"
+             [src]="image"
+             [class.active]="i === currentIndex">
+    </div>
+
+    <button class="carroussel--navigation-left" *ngIf="!isFirstImage()" (click)="prevImage()">
+        <img src="assets/images/arrow-back-white.svg">
+    </button>
+    <button class="carroussel--navigation-right" *ngIf="!isLastImage()" (click)="nextImage()">
+        <img src="assets/images/arrow-forward-white.svg">
+    </button>
+</div>

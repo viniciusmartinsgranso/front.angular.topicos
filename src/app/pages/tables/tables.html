@@ -1,0 +1,147 @@
+<div class="grid">
+  <div class="col-12">
+    <div class="card px-6 py-6">
+      <p-toast></p-toast>
+      <p-toolbar styleClass="mb-4">
+        <ng-template pTemplate="left">
+          <div class="m-2">
+            <button pButton pRipple label="New" icon="pi pi-plus" class="p-button-success mr-2"
+                    (click)="create()"></button>
+            <button pButton pRipple label="Delete" icon="pi pi-trash" class="p-button-danger"
+                    (click)="deleteSelectedTable()"
+                    [disabled]="!selectedTables || !selectedTables.length"></button>
+          </div>
+        </ng-template>
+
+        <ng-template pTemplate="right">
+          <p-fileUpload mode="basic" accept="image/*" [maxFileSize]="1000000" label="Import" chooseLabel="Import"
+                        class="mr-2 inline-block"></p-fileUpload>
+          <button pButton pRipple label="Export" icon="pi pi-upload" class="p-button-help"
+                  (click)="dt.exportCSV()"></button>
+        </ng-template>
+      </p-toolbar>
+
+      <p-table #dt [value]="tables" [columns]="cols" responsiveLayout="scroll" [rows]="10"
+               [globalFilterFields]="['name','isActive']" [paginator]="true" [rowsPerPageOptions]="[10,20,30]"
+               [showCurrentPageReport]="true"
+               currentPageReportTemplate="Mostrando {first} até {last} de {totalRecords} itens"
+               [(selection)]="selectedTables" selectionMode="multiple" [rowHover]="true" dataKey="id">
+        <ng-template pTemplate="caption">
+          <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+            <h5 class="m-0">Gerencie Mesas</h5>
+            <span class="block mt-2 md:mt-0 p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..."
+                                   class="w-full sm:w-auto"/>
+                        </span>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 3rem">
+              <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+            </th>
+            <th pSortableColumn="code">Id
+              <p-sortIcon field="code"></p-sortIcon>
+            </th>
+            <th pSortableColumn="isActive">Status
+              <p-sortIcon field="isActive"></p-sortIcon>
+            </th>
+            <th>Ações</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-table>
+          <tr>
+            <td>
+              <p-tableCheckbox [value]="table"></p-tableCheckbox>
+            </td>
+            <td style="width:14%; min-width:10rem;"><span class="p-column-title">Code</span>
+              {{ table.key }}
+            </td>
+            <td style="width:14%; min-width:10rem;"><span class="p-column-title">QRCode</span>
+              <p-button label="Ver QRCode" (onClick)="onShowQrCode(table)"></p-button>
+            </td>
+            <td>
+              {{ table.isActive ? 'Ativado' : 'Desativado' }}
+            </td>
+            <td>
+              <div class="flex">
+                <button *ngIf="table.isActive; else active" pButton pRipple icon="pi pi-trash"
+                        class="p-button-rounded p-button-warning"
+                        (click)="deleteTable(table)"></button>
+
+                <ng-template #active>
+                  <button pButton pRipple icon="pi pi-undo" class="p-button-rounded p-button-secondary"
+                          (click)="activate(table)"></button>
+                </ng-template>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+    <p-dialog [(visible)]="isCreating" [style]="{ width: '450px' }" header="Criar uma Mesa" [modal]="true"
+              class="p-fluid">
+      <ng-template pTemplate="content">
+        <div class="field px-3" [formGroup]="formGroup">
+          <label for="key">Mesa</label>
+          <input type="text" pInputText id="key" autofocus formControlName="key"/>
+          <small class="ng-dirty ng-invalid" *ngIf="submitted && !formGroup.valid">Informe o nome.</small>
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-outlined p-button-danger"
+                (click)="hideDialog()"></button>
+        <button pButton pRipple label="Save" [disabled]="formGroup.invalid" icon="pi pi-check"
+                class="p-button-outlined p-button-success" (click)="saveTable()"></button>
+      </ng-template>
+    </p-dialog>
+
+    <p-dialog [(visible)]="showQRCode" [style]="{ width: '450px' }" header="QRCode" [modal]="true" class="p-fluid">
+      <ng-template pTemplate="content">
+        <qrcode #qrCode [qrdata]="table.qrCodeUrl"
+                [allowEmptyString]="false"
+                [elementType]="'img'"
+                [cssClass]="'center'"
+                [colorDark]="'#000000ff'"
+                [colorLight]="'#ffffffff'"
+                [margin]="4"
+                [scale]="1"
+                [width]="300"
+        ></qrcode>
+
+        <div class="flex align-items-center justify-content-end gap-2 mt-3">
+          <p-button label="Imprimir" (onClick)="printQrCode(qrCode)"></p-button>
+          <p-button label="Fechar" (onClick)="closeQrCode()"></p-button>
+        </div>
+      </ng-template>
+    </p-dialog>
+
+    <p-dialog [(visible)]="deleteTableDialog" header="Deletar mesa" [modal]="true" [style]="{width:'450px'}">
+      <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="table">Deseja mesmo deletar essa mesa <b>{{ table.key }}</b>?</span>
+      </div>
+      <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No"
+                (click)="deleteTableDialog = false"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Yes" (click)="confirmDelete()"></button>
+      </ng-template>
+    </p-dialog>
+
+    <p-dialog [(visible)]="deleteTablesDialog" header="Deseja mesmo deletar essa mesa?" [modal]="true" [style]="{width:'450px'}">
+      <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span>Deseja mesmo deletar as mesas?</span>
+      </div>
+      <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No"
+                (click)="deleteTablesDialog = false"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Yes"
+                (click)="confirmDeleteSelected()"></button>
+      </ng-template>
+    </p-dialog>
+  </div>
+</div>

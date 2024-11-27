@@ -1,0 +1,54 @@
+<div class="col-12">
+  <div class="card" [formGroup]="formGroup">
+
+    <h5 class="text-center">Editar bebida</h5>
+
+    <div class="p-fluid p-formgrid grid" [formGroup]="formGroup">
+      <div class="field col-6">
+        <label>Nome da Bebida:</label>
+        <input pInputText formControlName="name"
+               placeholder="Informe o nome da bebida"
+               type="text"/>
+      </div>
+
+      <div class="field col-6">
+        <label>Preço:</label>
+        <p-inputNumber formControlName="price"
+                       mode="decimal"
+                       locale="pt-BR"
+                       [minFractionDigits]="2"
+        ></p-inputNumber>
+      </div>
+
+      <div class="field col-6">
+        <label>Imagem da bebida</label>
+        <input #image accept="image/png, image/jpg, image/jpeg"
+               (input)="getBase64($event)"
+               style="display: none;"
+               id="inputfile"
+               type="file" >
+        <p-button label="Selecione uma imagem" (click)="image.click()"></p-button>
+      </div>
+
+      <div class="field col-6" *ngIf="formGroup.controls['imageUrl'].value">
+        <img style="width: 100%; height: 100%; border-radius: 1rem; border-style: outset;" [src]="formGroup.controls['imageUrl'].value"/>
+      </div>
+    </div>
+
+    <div class="flex gap-2">
+      <button pButton pRipple
+              type="button"
+              label="Cancelar"
+              (click)="cancel()"
+              class="p-button-outlined p-button-danger"></button>
+
+      <button pButton pRipple
+              type="button"
+              label="Salvar"
+              (click)="onSubmit()"
+              class="p-button-outlined p-button-success"
+              [disabled]="formGroup.invalid"
+      ></button>
+    </div>
+  </div>
+</div>

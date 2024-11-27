@@ -1,0 +1,40 @@
+<div class="pizza-card" [formGroup]="form">
+  <label class="pizza-card--name">{{ pizza.name }}</label>
+
+  <div class="pizza-card--info" [style]="!pizza.canRemoveIngredients ? 'padding-bottom: 1rem' : ''">
+    <div class="pizza-card--info--ingredients">
+      <label class="pizza-card--info--ingredients--title">Ingredientes:</label>
+      <ng-container *ngFor="let ingredient of pizza.ingredients">
+        <label style="padding-left: 1.3rem; text-align: left">• {{ ingredient.name }}</label>
+      </ng-container>
+    </div>
+
+    <img class="pizza-card--info--img" [src]="pizza.imageUrl">
+  </div>
+
+  <p-divider></p-divider>
+  <ng-container *ngIf="pizza.canRemoveIngredients?.length">
+
+    <label>Personalize</label>
+
+    <div class="flex flex-wrap mt-3 gap-3 px-3 mb-3">
+      <ng-container formArrayName="removableIngredients">
+        <ng-container *ngFor="let ing of pizza.canRemoveIngredients; let i = index">
+          <p-checkbox [(ngModel)]="selectedIngredients"
+                      [ngModelOptions]="{ standalone: true }"
+                      [value]="ing.name"
+                      (ngModelChange)="setIngredientValue($event)"
+                      [label]="ing.name"></p-checkbox>
+          <label>|</label>
+        </ng-container>
+      </ng-container>
+    </div>
+  </ng-container>
+
+  <div class="text-right mb-3">
+    <button (click)="toggleSelection(true)" [ngClass]="{ 'p-button-outlined': !isSelected }" pButton pRipple
+            label="Quero" class="p-button-success p-button-rounded p-button-outlined"></button>
+    <button (click)="toggleSelection(false)" [ngClass]="{ 'p-button-outlined': isSelected }" pButton pRipple
+            label="Não quero" class="p-button-danger p-button-rounded p-button-outlined mx-3"></button>
+  </div>
+</div>

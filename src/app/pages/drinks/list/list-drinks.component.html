@@ -1,0 +1,122 @@
+<div class="grid">
+  <div class="col-12">
+    <div class="card px-6 py-6">
+      <p-toast></p-toast>
+      <p-toolbar styleClass="mb-4">
+        <ng-template pTemplate="left">
+          <div class="m-2">
+            <button pButton pRipple label="New" icon="pi pi-plus" class="p-button-success mr-2"
+                    (click)="openNew()"></button>
+            <button pButton pRipple label="Delete" icon="pi pi-trash" class="p-button-danger"
+                    (click)="deleteSelectedDrinks()"
+                    [disabled]="!selectedDrinks || !selectedDrinks.length"></button>
+          </div>
+        </ng-template>
+      </p-toolbar>
+
+      <ng-container *ngIf="drinks.length; else empty">
+        <p-table #dt [value]="drinks" [columns]="cols" responsiveLayout="scroll" [rows]="10"
+                 [globalFilterFields]="['name','isActive']" [paginator]="true" [rowsPerPageOptions]="[10,20,30]"
+                 [showCurrentPageReport]="true"
+                 currentPageReportTemplate="Mostrando {first} até {last} de {totalRecords} itens"
+                 [(selection)]="selectedDrinks" selectionMode="multiple" [rowHover]="true" dataKey="id">
+          <ng-template pTemplate="caption">
+            <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+              <h5 class="m-0">Gerencie Bebidas</h5>
+              <span class="block mt-2 md:mt-0 p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..."
+                                   class="w-full sm:w-auto"/>
+                        </span>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 3rem">
+                <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+              </th>
+              <th pSortableColumn="id">Id
+                <p-sortIcon field="id"></p-sortIcon>
+              </th>
+              <th pSortableColumn="name">Nome
+                <p-sortIcon field="name"></p-sortIcon>
+              </th>
+              <th pSortableColumn="name">Preço
+                <p-sortIcon field="price"></p-sortIcon>
+              </th>
+              <th pSortableColumn="isActive">Status
+                <p-sortIcon field="isActive"></p-sortIcon>
+              </th>
+              <th>Ações</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-drink>
+            <tr>
+              <td>
+                <p-tableCheckbox [value]="drink"></p-tableCheckbox>
+              </td>
+              <td style="width:14%; min-width:10rem;">
+                {{ drink.id }}
+              </td>
+              <td style="width:14%; min-width:10rem;">
+                {{ drink.name }}
+              </td>
+              <td style="width:14%; min-width:10rem;">
+                {{ drink.price }}
+              </td>
+              <td>
+                {{ drink.isActive ? 'Ativado' : 'Desativado' }}
+              </td>
+              <td>
+                <div class="flex">
+                  <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"
+                          (click)="editEntity(drink)"></button>
+                  <ng-container *ngIf="drink.isActive; else active">
+                    <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning"
+                            (click)="deactivate(drink)"></button>
+                  </ng-container>
+
+                  <ng-template #active>
+                    <button pButton pRipple icon="pi pi-undo" class="p-button-rounded p-button-secondary"
+                            (click)="activate(drink)"></button>
+                  </ng-template>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </ng-container>
+
+      <ng-template #empty>
+        <h1>Oops...</h1>
+        <h3>Não possuímos dados ainda :(</h3>
+      </ng-template>
+
+    </div>
+
+    <p-dialog [(visible)]="deleteProductDialog" header="Confirm" [modal]="true" [style]="{width:'450px'}">
+      <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="drink">Are you sure you want to delete <b>{{ drink.name }}</b>?</span>
+      </div>
+      <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No"
+                (click)="deleteProductDialog = false"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Yes" (click)="confirmDelete()"></button>
+      </ng-template>
+    </p-dialog>
+
+    <p-dialog [(visible)]="deleteProductsDialog" header="Confirm" [modal]="true" [style]="{width:'450px'}">
+      <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span>Are you sure you want to delete selected products?</span>
+      </div>
+      <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No"
+                (click)="deleteProductsDialog = false"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Yes"
+                (click)="confirmDeleteSelected()"></button>
+      </ng-template>
+    </p-dialog>
+  </div>
+</div>
